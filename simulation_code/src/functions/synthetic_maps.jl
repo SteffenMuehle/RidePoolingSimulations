@@ -113,45 +113,35 @@ function star_grid_map(N,M)
 
     #edges
     neighbours=Vector{Int}[]
-    neighbours_diag=Vector{Int}[]
     for nid in n
         list=Int[]
-        list_diag = Int[]
         x,y=(nodes[nid].east,nodes[nid].north)
         #up
         y<N ? push!(list,nid+M) : nothing
         #up-right
-        (y<N && x<M) ? push!(list_diag,nid+M+1) : nothing
+        (y<N && x<M) ? push!(list,nid+M+1) : nothing
         #right
         x<M ? push!(list,nid+1) : nothing
         #right-down
-        (y>1 && x<M) ? push!(list_diag,nid-M+1) : nothing
+        (y>1 && x<M) ? push!(list,nid-M+1) : nothing
         #down
         y>1 ? push!(list,nid-M) : nothing
         #down-left
-        (y>1 && x>1) ? push!(list_diag,nid-M-1) : nothing
+        (y>1 && x>1) ? push!(list,nid-M-1) : nothing
         #left
         x>1 ? push!(list,nid-1) : nothing
         #left-up
-        (y<N && x>1) ? push!(list_diag,nid+M-1) : nothing
+        (y<N && x>1) ? push!(list,nid+M-1) : nothing
         push!(neighbours,list)
-        push!(neighbours_diag,list_diag)
     end
-    
     e=[(i,j) for i in n for j in neighbours[i]]
-    e_diag =[(i,j) for i in n for j in neighbours_diag[i]]
 
     #edge weights
     mat=zeros(N*M,N*M)
     for edge in e
         mat[edge...]=1.0
     end
-    for edge in e_diag
-        mat[edge...]=sqrt(2)
-    end
     w=sparse(mat)
-    
-    append!(e,e_diag)
 
     #edge classes
     class=[1 for _ in 1:length(e)]
@@ -164,6 +154,7 @@ function star_grid_map(N,M)
     
     return OpenStreetMapX.MapData(bounds,nodes,roadways,intersections,g,v,n,e,w,class)
 end
+
 
 
 
